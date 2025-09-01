@@ -52,7 +52,7 @@ const navigationItems = [
     label: 'Gerenciamento',
     icon: Settings,
     path: '/',
-    description: 'Canais & Equipe'
+    description: 'Canais'
   },
   {
     id: 'channel-ideas',
