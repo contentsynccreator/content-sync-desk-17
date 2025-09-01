@@ -1,0 +1,259 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark Channel Manager Design System */
+@layer base {
+  :root {
+    /* Dark Mode Core Colors */
+    --background: 224 25% 5%;           /* #0A0E1A - Very dark blue-gray */
+    --background-secondary: 224 20% 8%; /* #111827 - Secondary dark */
+    --background-tertiary: 224 15% 12%; /* #1F2937 - Tertiary dark */
+    --foreground: 0 0% 98%;             /* #FAFAFA - Almost white */
+    
+    /* Card System */
+    --card: 224 15% 12%;                /* #1F2937 - Card background */
+    --card-secondary: 224 10% 16%;      /* #273548 - Secondary card */
+    --card-foreground: 0 0% 95%;        /* #F3F4F6 - Card text */
+    
+    /* Interactive Elements */
+    --primary: 267 85% 65%;             /* #8B5CF6 - Purple brand */
+    --primary-dark: 267 85% 55%;        /* #7C3AED - Darker purple */
+    --primary-foreground: 0 0% 100%;    /* #FFFFFF - White on purple */
+    
+    --secondary: 196 75% 55%;           /* #3B82F6 - Blue accent */
+    --secondary-dark: 196 75% 45%;      /* #2563EB - Darker blue */
+    --secondary-foreground: 0 0% 100%;  /* #FFFFFF - White on blue */
+    
+    --success: 142 85% 45%;             /* #10B981 - Green */
+    --warning: 38 92% 50%;              /* #F59E0B - Orange */
+    --danger: 0 85% 60%;                /* #EF4444 - Red */
+    
+    /* Muted Elements */
+    --muted: 224 10% 20%;               /* #374151 - Muted backgrounds */
+    --muted-foreground: 224 5% 60%;     /* #9CA3AF - Muted text */
+    
+    /* Borders & Inputs */
+    --border: 224 10% 25%;              /* #4B5563 - Border color */
+    --input: 224 15% 15%;               /* #252D3A - Input background */
+    --ring: 267 85% 65%;                /* #8B5CF6 - Focus ring */
+    
+    /* Special Colors for Channels */
+    --channel-tech: 217 91% 60%;        /* #3B82F6 - Tech blue */
+    --channel-lifestyle: 142 71% 45%;   /* #10B981 - Lifestyle green */
+    --channel-business: 267 85% 65%;    /* #8B5CF6 - Business purple */
+    --channel-entertainment: 340 82% 62%; /* #EC4899 - Entertainment pink */
+    --channel-education: 38 92% 50%;    /* #F59E0B - Education orange */
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-dark)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-dark)));
+    --gradient-dark: linear-gradient(135deg, hsl(var(--background)), hsl(var(--background-secondary)));
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+    
+    /* Animation Timings */
+    --transition-fast: 150ms ease-out;
+    --transition-normal: 250ms ease-out;
+    --transition-slow: 350ms ease-out;
+    
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  /* Card Components */
+  .card-primary {
+    @apply bg-card border border-border rounded-xl shadow-md backdrop-blur-sm;
+  }
+  
+  .card-secondary {
+    @apply bg-card-secondary border border-border rounded-lg shadow-sm;
+  }
+  
+  /* Button Variants */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-primary-dark text-primary-foreground;
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-200;
+    @apply hover:shadow-glow hover:scale-105 active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground px-4 py-2 rounded-lg;
+    @apply font-medium transition-colors hover:bg-secondary-dark;
+  }
+  
+  .btn-ghost {
+    @apply text-muted-foreground hover:text-foreground hover:bg-muted;
+    @apply px-4 py-2 rounded-lg transition-colors;
+  }
+  
+  .btn-success {
+    @apply bg-success text-white px-4 py-2 rounded-lg;
+    @apply font-medium transition-colors hover:bg-success/80;
+  }
+  
+  .btn-destructive {
+    @apply bg-danger text-white px-4 py-2 rounded-lg;
+    @apply font-medium transition-colors hover:bg-danger/80;
+  }
+  
+  /* Status Indicators */
+  .status-ideias {
+    @apply bg-channel-education/20 text-channel-education border-channel-education/30;
+  }
+  
+  .status-roteiro {
+    @apply bg-channel-tech/20 text-channel-tech border-channel-tech/30;
+  }
+  
+  .status-audio {
+    @apply bg-channel-entertainment/20 text-channel-entertainment border-channel-entertainment/30;
+  }
+  
+  .status-edicao {
+    @apply bg-channel-lifestyle/20 text-channel-lifestyle border-channel-lifestyle/30;
+  }
+  
+  .status-pronto {
+    @apply bg-success/20 text-success border-success/30;
+  }
+  
+  /* Kanban Columns */
+  .kanban-column {
+    @apply bg-background-secondary rounded-xl p-4 min-h-[600px];
+    @apply border border-border/50 shadow-lg backdrop-blur-sm;
+  }
+  
+  /* Video Cards */
+  .video-card {
+    @apply card-primary p-4 mb-3 cursor-grab active:cursor-grabbing;
+    @apply hover:shadow-lg transition-all duration-200 hover:scale-[1.02];
+    @apply border-l-4;
+  }
+  
+  /* Drag and Drop States */
+  .video-card.dragging {
+    @apply opacity-50 rotate-2 scale-95;
+  }
+  
+  .kanban-column.drag-over {
+    @apply bg-primary/10 border-primary scale-[1.02];
+  }
+  
+  /* Navigation */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground;
+    @apply hover:text-foreground hover:bg-background-tertiary transition-colors;
+  }
+  
+  .nav-item.active {
+    @apply text-primary bg-primary/10 border-r-2 border-primary;
+  }
+  
+  /* Input Styles */
+  .input-primary {
+    @apply bg-input border border-border rounded-lg px-4 py-2;
+    @apply text-foreground placeholder-muted-foreground;
+    @apply focus:ring-2 focus:ring-ring focus:border-transparent transition-all;
+  }
+  
+  /* Animations */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+  
+  .pulse-glow {
+    animation: pulseGlow 2s infinite;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 10px hsl(var(--primary) / 0.3); }
+  50% { box-shadow: 0 0 25px hsl(var(--primary) / 0.6); }
+}
