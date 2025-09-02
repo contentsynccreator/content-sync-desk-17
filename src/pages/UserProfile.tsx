@@ -57,7 +57,7 @@ const UserProfile = () => {
       setProfile(data);
       setFormData({
         nome: data.nome,
-        avatar_url: data.avatar_url || ''
+        avatar_url: ''
       });
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -79,7 +79,6 @@ const UserProfile = () => {
         .from('profiles')
         .update({
           nome: formData.nome,
-          avatar_url: formData.avatar_url,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
@@ -230,7 +229,7 @@ const UserProfile = () => {
             <CardContent className="space-y-6">
               <div className="flex items-center space-x-4">
                 <Avatar className="w-20 h-20">
-                  <AvatarImage src={profile.avatar_url} />
+                  <AvatarImage src="" />
                   <AvatarFallback>
                     {profile.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                   </AvatarFallback>
@@ -256,15 +255,6 @@ const UserProfile = () => {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="avatar_url">URL do Avatar</Label>
-                    <Input
-                      id="avatar_url"
-                      value={formData.avatar_url}
-                      onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                      placeholder="https://exemplo.com/avatar.jpg"
-                    />
-                  </div>
 
                   <div className="flex gap-2">
                     <Button onClick={handleSave}>Salvar</Button>

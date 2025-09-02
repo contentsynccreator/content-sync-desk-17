@@ -80,6 +80,51 @@ export type Database = {
         }
         Relationships: []
       }
+      competitor_channels: {
+        Row: {
+          avg_views: number | null
+          content_style: string | null
+          created_at: string
+          id: string
+          link: string
+          nicho: string | null
+          nome: string
+          notes: string | null
+          subscribers_count: number | null
+          updated_at: string
+          upload_frequency: string | null
+          user_id: string
+        }
+        Insert: {
+          avg_views?: number | null
+          content_style?: string | null
+          created_at?: string
+          id?: string
+          link: string
+          nicho?: string | null
+          nome: string
+          notes?: string | null
+          subscribers_count?: number | null
+          updated_at?: string
+          upload_frequency?: string | null
+          user_id: string
+        }
+        Update: {
+          avg_views?: number | null
+          content_style?: string | null
+          created_at?: string
+          id?: string
+          link?: string
+          nicho?: string | null
+          nome?: string
+          notes?: string | null
+          subscribers_count?: number | null
+          updated_at?: string
+          upload_frequency?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ideias: {
         Row: {
           canal_id: string
@@ -198,6 +243,72 @@ export type Database = {
           },
         ]
       }
+      user_settings: {
+        Row: {
+          created_at: string
+          email_notifications: boolean | null
+          id: string
+          language: string | null
+          notifications_enabled: boolean | null
+          theme: string | null
+          timezone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          language?: string | null
+          notifications_enabled?: boolean | null
+          theme?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          language?: string | null
+          notifications_enabled?: boolean | null
+          theme?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      usuarios: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          nome: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          nome: string
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          nome?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       videos: {
         Row: {
           canal_id: string
@@ -262,7 +373,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      authenticate_member: {
+        Args: { p_password: string; p_username: string }
+        Returns: {
+          member_id: string
+          member_name: string
+          session_token: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

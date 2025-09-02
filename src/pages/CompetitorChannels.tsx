@@ -65,10 +65,33 @@ const CompetitorChannels = () => {
     if (!user) return;
 
     try {
-      // Por agora vamos usar localStorage até as tabelas serem criadas
-      const stored = localStorage.getItem(`competitor_channels_${user.id}`);
-      const data = stored ? JSON.parse(stored) : [];
-      setChannels(data);
+      const { data, error } = await supabase
+        .from('competitor_channels')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      // Map database fields to component interface
+      const mappedData = data.map(channel => ({
+        id: channel.id,
+        nome: channel.nome,
+        endereco_canal: channel.link,
+        nicho: channel.nicho || '',
+        sub_nicho: channel.content_style || '',
+        micro_nicho: channel.upload_frequency || '',
+        canal_proprio_id: '',
+        canal_proprio_nome: '',
+        observacao: channel.notes || '',
+        detalhes: `Inscritos: ${channel.subscribers_count || 0} | Visualizações médias: ${channel.avg_views || 0}`,
+        favorito: false,
+        created_at: channel.created_at,
+        updated_at: channel.updated_at,
+        user_id: channel.user_id
+      }));
+      
+      setChannels(mappedData);
     } catch (error) {
       console.error('Error loading competitor channels:', error);
       toast({
@@ -81,9 +104,31 @@ const CompetitorChannels = () => {
     }
   };
 
-  const saveChannels = (newChannels: CompetitorChannel[]) => {
+  const saveToDatabase = async (channelData: any) => {
     if (!user) return;
-    localStorage.setItem(`competitor_channels_${user.id}`, JSON.stringify(newChannels));
+    
+    try {
+      const { data, error } = await supabase
+        .from('competitor_channels')
+        .insert({
+          nome: channelData.nome,
+          link: channelData.endereco_canal,
+          nicho: channelData.nicho,
+          content_style: channelData.sub_nicho,
+          upload_frequency: channelData.micro_nicho,
+          notes: channelData.observacao,
+          subscribers_count: 0,
+          avg_views: 0,
+          user_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,40 +137,46 @@ const CompetitorChannels = () => {
 
     try {
       if (editingChannel) {
-        const canalProprioNome = canais.find(c => c.id === formData.canal_proprio_id)?.nome || '';
-        
-        const updatedChannels = channels.map(channel =>
-          channel.id === editingChannel.id
-            ? { 
-                ...channel, 
-                ...formData, 
-                canal_proprio_nome: canalProprioNome,
-                updated_at: new Date().toISOString() 
-              }
-            : channel
-        );
-        setChannels(updatedChannels);
-        saveChannels(updatedChannels);
+        const { error } = await supabase
+          .from('competitor_channels')
+          .update({
+            nome: formData.nome,
+            link: formData.endereco_canal,
+            nicho: formData.nicho,
+            content_style: formData.sub_nicho,
+            upload_frequency: formData.micro_nicho,
+            notes: formData.observacao
+          })
+          .eq('id', editingChannel.id)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
 
         toast({
           title: "Canal atualizado!",
           description: "Canal concorrente atualizado com sucesso"
         });
       } else {
-        const canalProprioNome = canais.find(c => c.id === formData.canal_proprio_id)?.nome || '';
+        const newData = await saveToDatabase(formData);
         
-        const newChannel: CompetitorChannel = {
-          id: Date.now().toString(),
-          ...formData,
-          canal_proprio_nome: canalProprioNome,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          user_id: user.id
+        const mappedChannel = {
+          id: newData.id,
+          nome: newData.nome,
+          endereco_canal: newData.link,
+          nicho: newData.nicho || '',
+          sub_nicho: newData.content_style || '',
+          micro_nicho: newData.upload_frequency || '',
+          canal_proprio_id: '',
+          canal_proprio_nome: '',
+          observacao: newData.notes || '',
+          detalhes: `Inscritos: ${newData.subscribers_count || 0} | Visualizações médias: ${newData.avg_views || 0}`,
+          favorito: false,
+          created_at: newData.created_at,
+          updated_at: newData.updated_at,
+          user_id: newData.user_id
         };
         
-        const updatedChannels = [...channels, newChannel];
-        setChannels(updatedChannels);
-        saveChannels(updatedChannels);
+        setChannels(prev => [...prev, mappedChannel]);
 
         toast({
           title: "Canal adicionado!",
@@ -134,6 +185,7 @@ const CompetitorChannels = () => {
       }
 
       resetForm();
+      loadChannels();
     } catch (error) {
       console.error('Error saving competitor channel:', error);
       toast({
@@ -148,9 +200,15 @@ const CompetitorChannels = () => {
     if (!user || !confirm('Tem certeza que deseja excluir este canal?')) return;
 
     try {
-      const updatedChannels = channels.filter(channel => channel.id !== channelId);
-      setChannels(updatedChannels);
-      saveChannels(updatedChannels);
+      const { error } = await supabase
+        .from('competitor_channels')
+        .delete()
+        .eq('id', channelId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setChannels(prev => prev.filter(channel => channel.id !== channelId));
 
       toast({
         title: "Canal excluído!",
@@ -176,7 +234,6 @@ const CompetitorChannels = () => {
           : ch
       );
       setChannels(updatedChannels);
-      saveChannels(updatedChannels);
     } catch (error) {
       console.error('Error toggling favorite:', error);
       toast({

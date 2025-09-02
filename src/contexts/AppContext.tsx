@@ -158,10 +158,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     
     if (error) throw error;
     
-    const canaisFormatted = data.map(canal => ({
+    const canaisFormatted: Canal[] = data.map(canal => ({
       ...canal,
       dias_postagem: canal.dias_postagem || [],
-      horarios_postagem: canal.horarios_postagem || []
+      horarios_postagem: canal.horarios_postagem || [],
+      alarme_tipo: (canal.alarme_tipo as 'dias' | 'quantidade') || 'dias'
     }));
     
     setCanais(canaisFormatted);
@@ -171,9 +172,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (!user) return;
     
     const { data, error } = await supabase
-      .from('profiles')
+      .from('usuarios')
       .select('*')
-      .neq('id', user.id); // Não incluir o usuário atual, apenas membros da equipe
+      .eq('user_id', user.id);
     
     if (error) throw error;
     setUsuarios(data || []);
@@ -303,10 +304,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       if (error) throw error;
       
-      const newCanal = {
+      const newCanal: Canal = {
         ...data,
         dias_postagem: data.dias_postagem || [],
-        horarios_postagem: data.horarios_postagem || []
+        horarios_postagem: data.horarios_postagem || [],
+        alarme_tipo: (data.alarme_tipo as 'dias' | 'quantidade') || 'dias'
       };
       
       setCanais(prev => [...prev, newCanal]);
@@ -384,18 +386,44 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Usuario Actions
   const addUsuario = async (usuario: Omit<Usuario, 'id'>) => {
-    // Note: This function creates a profile, but requires auth.users to exist first
-    // In a real app, this would be handled by the signup process
-    console.warn('addUsuario: This function should only be used with existing auth users');
-    return;
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('usuarios')
+        .insert({
+          ...usuario,
+          user_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setUsuarios(prev => [...prev, data]);
+      
+      toast({
+        title: "Sucesso!",
+        description: "Usuário criado com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao criar usuário",
+        description: error.message,
+      });
+    }
   };
 
   const updateUsuario = async (id: string, usuarioUpdate: Partial<Usuario>) => {
+    if (!user) return;
+    
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from('usuarios')
         .update(usuarioUpdate)
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
       if (error) throw error;
       
@@ -417,11 +445,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const deleteUsuario = async (id: string) => {
+    if (!user) return;
+    
     try {
       const { error } = await supabase
-        .from('profiles')
+        .from('usuarios')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
       if (error) throw error;
       
