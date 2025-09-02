@@ -20,48 +20,47 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    console.log('Iniciando criação de membro da equipe...');
-    
-    // Get environment variables
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
-    
-    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
-      console.error('Missing environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Server configuration error' }),
-        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
-    }
+    console.log('Starting create team member process...');
+
+    // Get request data
+    const { email, password, nome, role }: CreateMemberRequest = await req.json();
+    console.log('Request data:', { email, nome, role });
 
     // Create Supabase admin client
-    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
+    const supabaseAdmin = createClient(
+      "https://tehdaizgsltynxefecui.supabase.co",
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
       }
-    });
+    );
 
-    // Create regular Supabase client for RLS checks
+    // Create regular Supabase client for auth checks
     const authHeader = req.headers.get('Authorization');
-    const supabase = createClient(supabaseUrl, anonKey, {
-      global: {
-        headers: authHeader ? { Authorization: authHeader } : {}
+    const supabase = createClient(
+      "https://tehdaizgsltynxefecui.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlaGRhaXpnc2x0eW54ZWZlY3VpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2NjUxMjgsImV4cCI6MjA3MjI0MTEyOH0.s9f9kLMZ5h1fqsqSUQd981NZ2nuEdnFhKcjTU27ZSr4",
+      {
+        global: {
+          headers: authHeader ? { Authorization: authHeader } : {}
+        }
       }
-    });
+    );
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
-      console.error('Auth error:', userError);
+      console.log('Unauthorized user:', userError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
-    console.log('Current user:', user.id);
+    console.log('Current user ID:', user.id);
 
     // Check if current user is admin
     const { data: profile, error: profileError } = await supabase
@@ -70,16 +69,17 @@ const handler = async (req: Request): Promise<Response> => {
       .eq('id', user.id)
       .single();
 
+    console.log('User profile:', profile, 'Error:', profileError);
+
     if (profileError || !profile || !['admin', 'super_admin'].includes(profile.role)) {
-      console.error('Permission error. User role:', profile?.role);
+      console.log('Access denied. User role:', profile?.role);
       return new Response(
         JSON.stringify({ error: 'Access denied. Only admins can create team members.' }),
         { status: 403, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
-    const { email, password, nome, role }: CreateMemberRequest = await req.json();
-    console.log('Creating user with email:', email, 'role:', role);
+    console.log('Creating user with admin client...');
 
     // Create user in auth.users using admin client
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -125,12 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
       console.error('Error creating usuario entry:', usuarioError);
     }
 
-    console.log('Team member created successfully:', {
-      id: newUser.user.id,
-      email: email,
-      nome: nome,
-      role: role
-    });
+    console.log('Team member created successfully');
 
     return new Response(
       JSON.stringify({ 

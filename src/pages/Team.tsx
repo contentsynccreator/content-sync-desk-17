@@ -79,10 +79,12 @@ const Team = () => {
         });
 
         if (error) {
-          throw new Error(error.message);
+          console.error('Edge function error:', error);
+          throw new Error(error.message || 'Erro na função de criação');
         }
 
-        if (data.error) {
+        if (data?.error) {
+          console.error('Edge function returned error:', data.error);
           throw new Error(data.error);
         }
 
