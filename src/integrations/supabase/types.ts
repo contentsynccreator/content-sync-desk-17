@@ -381,6 +381,15 @@ export type Database = {
           session_token: string
         }[]
       }
+      create_team_member: {
+        Args: {
+          p_email: string
+          p_nome: string
+          p_password: string
+          p_role?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

@@ -10,6 +10,7 @@ import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TeamMember {
   id: string;
@@ -31,7 +32,8 @@ const Team = () => {
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
-    funcao: ''
+    funcao: '',
+    senha: ''
   });
 
   const teamMembers: TeamMember[] = usuarios.map(usuario => ({
@@ -54,8 +56,6 @@ const Team = () => {
     if (!user) return;
 
     try {
-      const tempPassword = generateTempPassword();
-      
       if (editingMember) {
         await updateUsuario(editingMember.id, {
           nome: formData.nome,
@@ -68,24 +68,36 @@ const Team = () => {
           description: "As informações do membro foram atualizadas com sucesso"
         });
       } else {
-        await addUsuario({
-          nome: formData.nome,
-          email: formData.email,
-          role: formData.funcao
+        // Criar membro via edge function
+        const { data, error } = await supabase.functions.invoke('create-team-member', {
+          body: {
+            email: formData.email,
+            password: formData.senha,
+            nome: formData.nome,
+            role: formData.funcao
+          }
         });
 
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
         toast({
-          title: "Membro convidado!",
-          description: `${formData.nome} foi convidado para a equipe. Senha temporária: ${tempPassword}`
+          title: "Membro criado com sucesso!",
+          description: `${formData.nome} foi criado. Login: ${formData.email}, Senha: ${formData.senha}`
         });
       }
 
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error managing team member:', error);
       toast({
         title: "Erro",
-        description: "Erro ao gerenciar membro da equipe",
+        description: error.message || "Erro ao gerenciar membro da equipe",
         variant: "destructive"
       });
     }
@@ -113,7 +125,8 @@ const Team = () => {
     setFormData({
       nome: '',
       email: '',
-      funcao: ''
+      funcao: '',
+      senha: ''
     });
     setEditingMember(null);
     setShowForm(false);
@@ -123,7 +136,8 @@ const Team = () => {
     setFormData({
       nome: member.nome,
       email: member.email,
-      funcao: member.funcao
+      funcao: member.funcao,
+      senha: ''
     });
     setEditingMember(member);
     setShowForm(true);
@@ -209,6 +223,23 @@ const Team = () => {
                     Digite a função específica deste membro na equipe
                   </p>
                 </div>
+
+                {!editingMember && (
+                  <div className="space-y-2">
+                    <Label htmlFor="senha">Senha</Label>
+                    <Input
+                      id="senha"
+                      type="password"
+                      value={formData.senha}
+                      onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
+                      placeholder="Digite a senha do membro"
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Esta será a senha que o membro usará para fazer login
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex gap-2">
                   <Button type="submit" className="flex-1">
