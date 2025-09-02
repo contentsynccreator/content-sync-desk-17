@@ -14,7 +14,249 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      canais: {
+        Row: {
+          alarme_alerta_dias: number | null
+          alarme_minimo_videos: number | null
+          alarme_tipo: string | null
+          alarme_urgente_dias: number | null
+          cor: string
+          created_at: string | null
+          dias_postagem: string[] | null
+          freq_postagem: string
+          horarios_postagem: string[] | null
+          id: string
+          lingua: string
+          link: string
+          logo_url: string | null
+          micro_nicho: string
+          nicho: string
+          nome: string
+          sub_nicho: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alarme_alerta_dias?: number | null
+          alarme_minimo_videos?: number | null
+          alarme_tipo?: string | null
+          alarme_urgente_dias?: number | null
+          cor: string
+          created_at?: string | null
+          dias_postagem?: string[] | null
+          freq_postagem: string
+          horarios_postagem?: string[] | null
+          id?: string
+          lingua: string
+          link: string
+          logo_url?: string | null
+          micro_nicho: string
+          nicho: string
+          nome: string
+          sub_nicho: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alarme_alerta_dias?: number | null
+          alarme_minimo_videos?: number | null
+          alarme_tipo?: string | null
+          alarme_urgente_dias?: number | null
+          cor?: string
+          created_at?: string | null
+          dias_postagem?: string[] | null
+          freq_postagem?: string
+          horarios_postagem?: string[] | null
+          id?: string
+          lingua?: string
+          link?: string
+          logo_url?: string | null
+          micro_nicho?: string
+          nicho?: string
+          nome?: string
+          sub_nicho?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ideias: {
+        Row: {
+          canal_id: string
+          created_at: string | null
+          data_criacao: string | null
+          descricao: string | null
+          id: string
+          status: string
+          titulo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          canal_id: string
+          created_at?: string | null
+          data_criacao?: string | null
+          descricao?: string | null
+          id?: string
+          status?: string
+          titulo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          canal_id?: string
+          created_at?: string | null
+          data_criacao?: string | null
+          descricao?: string | null
+          id?: string
+          status?: string
+          titulo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ideias_canal_id_fkey"
+            columns: ["canal_id"]
+            isOneToOne: false
+            referencedRelation: "canais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          nome: string
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id: string
+          nome: string
+          role?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          nome?: string
+          role?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      scheduled_videos: {
+        Row: {
+          canal_id: string
+          created_at: string | null
+          data_agendada: string
+          hora_agendada: string
+          id: string
+          link_youtube: string | null
+          status: string
+          titulo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          canal_id: string
+          created_at?: string | null
+          data_agendada: string
+          hora_agendada: string
+          id?: string
+          link_youtube?: string | null
+          status?: string
+          titulo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          canal_id?: string
+          created_at?: string | null
+          data_agendada?: string
+          hora_agendada?: string
+          id?: string
+          link_youtube?: string | null
+          status?: string
+          titulo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_videos_canal_id_fkey"
+            columns: ["canal_id"]
+            isOneToOne: false
+            referencedRelation: "canais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      videos: {
+        Row: {
+          canal_id: string
+          created_at: string | null
+          data_agendada: string | null
+          data_criacao: string | null
+          google_drive_folder_link: string | null
+          google_drive_link: string | null
+          hora_agendada: string | null
+          id: string
+          responsavel_id: string | null
+          status: string
+          thumbnail_pronta: boolean | null
+          titulo: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          canal_id: string
+          created_at?: string | null
+          data_agendada?: string | null
+          data_criacao?: string | null
+          google_drive_folder_link?: string | null
+          google_drive_link?: string | null
+          hora_agendada?: string | null
+          id?: string
+          responsavel_id?: string | null
+          status?: string
+          thumbnail_pronta?: boolean | null
+          titulo: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          canal_id?: string
+          created_at?: string | null
+          data_agendada?: string | null
+          data_criacao?: string | null
+          google_drive_folder_link?: string | null
+          google_drive_link?: string | null
+          hora_agendada?: string | null
+          id?: string
+          responsavel_id?: string | null
+          status?: string
+          thumbnail_pronta?: boolean | null
+          titulo?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "videos_canal_id_fkey"
+            columns: ["canal_id"]
+            isOneToOne: false
+            referencedRelation: "canais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
