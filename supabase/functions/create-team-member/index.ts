@@ -20,38 +20,48 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log('Iniciando criação de membro da equipe...');
+    
+    // Get environment variables
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+    
+    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
+      console.error('Missing environment variables');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
     // Create Supabase admin client
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
       }
-    );
+    });
 
     // Create regular Supabase client for RLS checks
     const authHeader = req.headers.get('Authorization');
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: authHeader ? { Authorization: authHeader } : {}
-        }
+    const supabase = createClient(supabaseUrl, anonKey, {
+      global: {
+        headers: authHeader ? { Authorization: authHeader } : {}
       }
-    );
+    });
 
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
+      console.error('Auth error:', userError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
+
+    console.log('Current user:', user.id);
 
     // Check if current user is admin
     const { data: profile, error: profileError } = await supabase
@@ -61,6 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     if (profileError || !profile || !['admin', 'super_admin'].includes(profile.role)) {
+      console.error('Permission error. User role:', profile?.role);
       return new Response(
         JSON.stringify({ error: 'Access denied. Only admins can create team members.' }),
         { status: 403, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
@@ -68,6 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const { email, password, nome, role }: CreateMemberRequest = await req.json();
+    console.log('Creating user with email:', email, 'role:', role);
 
     // Create user in auth.users using admin client
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -86,6 +98,8 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
+
+    console.log('User created successfully:', newUser.user.id);
 
     // Update the profile role (the trigger should have created a basic profile)
     const { error: updateError } = await supabaseAdmin
